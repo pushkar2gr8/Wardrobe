@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <ImageView
+        android:id="@+id/user_data"
+        android:layout_height="match_parent"
+        android:layout_width="366dp"
+        android:layout_marginLeft="@dimen/cardview_left_margin"
+        android:layout_marginRight="@dimen/cardview_right_margin"
+        android:src="@drawable/progress_image"/>
+</LinearLayout>
