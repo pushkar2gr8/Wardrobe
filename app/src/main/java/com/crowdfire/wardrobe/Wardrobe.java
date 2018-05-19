@@ -16,6 +16,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.util.DisplayMetrics;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Switch;
@@ -48,7 +49,7 @@ public class Wardrobe extends AppCompatActivity {
                     Toast.LENGTH_LONG).show();
         } else {
             ActivityCompat.requestPermissions(Wardrobe.this,new String[]{
-                    Manifest.permission.CAMERA}, RequestPermissionCode);
+                    Manifest.permission.CAMERA,Manifest.permission.READ_EXTERNAL_STORAGE}, RequestPermissionCode);
         }
 
         topView = (RecyclerView)findViewById(R.id.top_view);
@@ -78,6 +79,7 @@ public class Wardrobe extends AppCompatActivity {
             public void onClick(View v) {
                 Intent photoCaptureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 startActivityForResult(photoCaptureIntent, requestCode);
+                //startActivity(photoCaptureIntent);
                 setImage(v);
             }
         });
@@ -93,14 +95,31 @@ public class Wardrobe extends AppCompatActivity {
             public void onClick(View v) {
                 Intent photoCaptureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 startActivityForResult(photoCaptureIntent, requestCode);
+//                startActivity(photoCaptureIntent);
                 setImage(v);
             }
         });
     }
 
+
     public void setImage(View view){
         switch(view.getId()){
             case R.id.top_floating_camera:
+                cambutton = "top";
+                break;
+            case R.id.bottom_floating_camera:
+                cambutton = "bottom";
+                break;
+            // even more buttons here
+        }
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(this.requestCode == requestCode && resultCode == RESULT_OK){
+            if(cambutton.equals("top")){
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -115,8 +134,8 @@ public class Wardrobe extends AppCompatActivity {
                         topView.setAdapter(adapter);
                     }
                 });
-                break;
-            case R.id.bottom_floating_camera:
+            }
+            else {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -126,24 +145,14 @@ public class Wardrobe extends AppCompatActivity {
                         ImageLoaderAdapter adapter = new ImageLoaderAdapter(getApplicationContext(),
                                 new ImageData().capturedImage(getApplicationContext()));
                         bottomView.addItemDecoration
-                                (new DividerItemDecoration(topView.getContext()
+                                (new DividerItemDecoration(bottomView.getContext()
                                         , DividerItemDecoration.HORIZONTAL));
                         bottomView.setAdapter(adapter);
                     }
                 });
-                break;
-            // even more buttons here
+            }
         }
-
     }
-
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        if(this.requestCode == requestCode && resultCode == RESULT_OK){
-//
-//        }
-//    }
 
     public class loadImages extends AsyncTask<Void , Void ,Void>{
 

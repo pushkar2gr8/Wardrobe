@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.provider.MediaStore;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class ImageData
 {
@@ -82,11 +83,9 @@ public class ImageData
             listOfAllImages.add(absolutePathOfImage);
         }
 
-        for(int i=0;i<1;i++){
-            System.out.println("Images are::"+listOfAllImages.get(i));
-            latestImage.add(listOfAllImages.get(listOfAllImages.size()-1));
-            image = listOfAllImages.get(listOfAllImages.size()-1);
-        }
+
+        latestImage.add(listOfAllImages.get(listOfAllImages.size()-1));
+        image = listOfAllImages.get(listOfAllImages.size()-1);
 
         System.out.println("Latest image::"+image);
 
