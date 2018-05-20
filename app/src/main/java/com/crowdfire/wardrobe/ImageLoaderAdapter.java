@@ -41,13 +41,15 @@ public class ImageLoaderAdapter extends RecyclerView.Adapter<ImageLoaderAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ImageViewHolder holder, int position) {
-//        Picasso.get()
-//                .load(new File(imageList.get(position)))
-//                .memoryPolicy(MemoryPolicy.NO_CACHE)
-//                .into(holder.img);
-        //Picasso.get().load(imageList.get(position)).into(holder.img);
+        Random rnd = new Random();
+        int i = rnd.nextInt(imageList.size());
 
-        holder.img.setImageURI(Uri.parse(imageList.get(position)));
+        Picasso.get()
+                .load(new File(imageList.get(i)))
+                .memoryPolicy(MemoryPolicy.NO_CACHE)
+                .into(holder.img);
+
+        //holder.img.setImageURI(Uri.parse(imageList.get(position)));
     }
 
     @Override

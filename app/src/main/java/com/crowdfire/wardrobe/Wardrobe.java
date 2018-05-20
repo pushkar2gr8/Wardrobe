@@ -3,6 +3,7 @@ package com.crowdfire.wardrobe;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -22,6 +23,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -43,11 +45,20 @@ public class Wardrobe extends AppCompatActivity {
     String cambutton = "false";
     private int PICK_IMAGE_REQUEST = 1;
     ArrayList<String> gImage = new ArrayList<String>();
+    String KEY_TEXT_VALUE = "textValue";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wardrobe);
+
+        img = (ImageView)findViewById(R.id.user_data);
+
+        if (savedInstanceState != null) {
+            ArrayList<String> savedData = savedInstanceState.getStringArrayList(KEY_TEXT_VALUE);
+            ImageLoaderAdapter adapter = new ImageLoaderAdapter(getApplicationContext(),
+                    savedData);
+        }
 
         if (ActivityCompat.shouldShowRequestPermissionRationale(Wardrobe.this,
                 Manifest.permission.CAMERA))
@@ -326,5 +337,13 @@ public class Wardrobe extends AppCompatActivity {
             });
         }
 
+    }
+
+    @Override
+    protected void onSaveInstanceState (Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putStringArrayList(KEY_TEXT_VALUE,
+                new ImageData().topView(getApplicationContext()));
     }
 }
