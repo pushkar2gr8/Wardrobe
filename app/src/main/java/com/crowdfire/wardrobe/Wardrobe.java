@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -17,20 +18,24 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 
 public class Wardrobe extends AppCompatActivity {
 
     RecyclerView topView,bottomView;
-    com.github.clans.fab.FloatingActionButton cameraButton,middleButton,gallaryButton,topCameraButton,topGallaryButton;
+    com.github.clans.fab.FloatingActionButton cameraButton,gallaryButton,topCameraButton,topGallaryButton;
+    FloatingActionButton middleButton,likebutton;
     Context ctx;
     ImageView img;
     private final int requestCode = 20;
@@ -52,7 +57,10 @@ public class Wardrobe extends AppCompatActivity {
                     Toast.LENGTH_LONG).show();
         } else {
             ActivityCompat.requestPermissions(Wardrobe.this,new String[]{
-                    Manifest.permission.CAMERA,Manifest.permission.READ_EXTERNAL_STORAGE}, RequestPermissionCode);
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE}
+                    , RequestPermissionCode);
         }
 
         topView = (RecyclerView)findViewById(R.id.top_view);
@@ -70,12 +78,30 @@ public class Wardrobe extends AppCompatActivity {
         topGallaryButton = (com.github.clans.fab.FloatingActionButton)
                 findViewById(R.id.top_floating_file_system);
 
+        middleButton = (FloatingActionButton)findViewById(R.id.middle_add);
+
+        likebutton = (FloatingActionButton)findViewById(R.id.like_button);
+
         //capture the size of the devices screen
         DisplayMetrics displaymetrics = getResources().getDisplayMetrics();
         int height = displaymetrics.heightPixels;
         topView.getLayoutParams().height = (height-250)/2;
 
-        //new loadImages().execute();
+
+        middleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new loadImages().execute();
+            }
+        });
+
+        likebutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bitmap bitmap = takeScreenshot();
+                saveBitmap(bitmap);
+            }
+        });
 
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -122,7 +148,11 @@ public class Wardrobe extends AppCompatActivity {
         startActivityForResult(photoCaptureIntent, requestCode);
     }
 
-
+    public Bitmap takeScreenshot() {
+        View rootView = findViewById(android.R.id.content).getRootView();
+        rootView.setDrawingCacheEnabled(true);
+        return rootView.getDrawingCache();
+    }
 
     public void setImage(View view){
         switch(view.getId()){
@@ -142,6 +172,20 @@ public class Wardrobe extends AppCompatActivity {
         }
 
     }
+
+    public void saveBitmap(Bitmap bitmap) {
+        File imagePath = new File(Environment.getExternalStorageDirectory() + "/screenshot.png");
+        FileOutputStream fos;
+        try {
+            fos = new FileOutputStream(imagePath);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            fos.flush();
+            fos.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
