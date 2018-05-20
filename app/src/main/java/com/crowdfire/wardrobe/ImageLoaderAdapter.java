@@ -2,6 +2,7 @@ package com.crowdfire.wardrobe;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -40,11 +41,13 @@ public class ImageLoaderAdapter extends RecyclerView.Adapter<ImageLoaderAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ImageViewHolder holder, int position) {
-        Picasso.get()
-                .load(new File(imageList.get(position)))
-                .memoryPolicy(MemoryPolicy.NO_CACHE)
-                .into(holder.img);
+//        Picasso.get()
+//                .load(new File(imageList.get(position)))
+//                .memoryPolicy(MemoryPolicy.NO_CACHE)
+//                .into(holder.img);
         //Picasso.get().load(imageList.get(position)).into(holder.img);
+
+        holder.img.setImageURI(Uri.parse(imageList.get(position)));
     }
 
     @Override

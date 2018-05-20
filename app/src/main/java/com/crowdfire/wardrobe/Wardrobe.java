@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
@@ -22,6 +23,8 @@ import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class Wardrobe extends AppCompatActivity {
@@ -33,8 +36,8 @@ public class Wardrobe extends AppCompatActivity {
     private final int requestCode = 20;
     public  static final int RequestPermissionCode  = 1;
     String cambutton = "false";
-
-    ArrayList<Bitmap> cameraImage;
+    private int PICK_IMAGE_REQUEST = 1;
+    ArrayList<String> gImage = new ArrayList<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,9 +80,7 @@ public class Wardrobe extends AppCompatActivity {
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent photoCaptureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(photoCaptureIntent, requestCode);
-                //startActivity(photoCaptureIntent);
+                pickCameraImage();
                 setImage(v);
             }
         });
@@ -87,19 +88,40 @@ public class Wardrobe extends AppCompatActivity {
         gallaryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                pickImage();
+                setImage(v);
             }
         });
 
         topCameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent photoCaptureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(photoCaptureIntent, requestCode);
-//                startActivity(photoCaptureIntent);
+                pickCameraImage();
+                setImage(v);
+            }
+        });
+
+        topGallaryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pickImage();
                 setImage(v);
             }
         });
     }
+
+    public void pickImage() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+    }
+
+    public void pickCameraImage(){
+        Intent photoCaptureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(photoCaptureIntent, requestCode);
+    }
+
 
 
     public void setImage(View view){
@@ -110,7 +132,13 @@ public class Wardrobe extends AppCompatActivity {
             case R.id.bottom_floating_camera:
                 cambutton = "bottom";
                 break;
-            // even more buttons here
+            case R.id.top_floating_file_system:
+                cambutton = "top_gallary";
+                break;
+            case R.id.bottom_floating_file_system:
+                cambutton = "bottom_gallary";
+                break;
+                // even more buttons here
         }
 
     }
@@ -150,6 +178,57 @@ public class Wardrobe extends AppCompatActivity {
                         bottomView.setAdapter(adapter);
                     }
                 });
+            }
+        }
+        if(cambutton.equals("top_gallary")){
+            Uri uri = data.getData();
+            String path = null;
+
+            try {
+                path = uri.toString();
+                gImage.add(path);
+                System.out.println("selected images"+path);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        topView.setHasFixedSize(true);
+                        topView.setLayoutManager(new LinearLayoutManager(getApplicationContext()
+                                ,LinearLayoutManager.HORIZONTAL,false));
+                        ImageLoaderAdapter adapter =
+                                new ImageLoaderAdapter(getApplicationContext(),gImage);
+                        topView.addItemDecoration
+                                (new DividerItemDecoration(topView.getContext()
+                                        , DividerItemDecoration.HORIZONTAL));
+                        topView.setAdapter(adapter);
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        else if(cambutton == "bottom_gallary"){
+            Uri uri = data.getData();
+
+            try {
+                String path = uri.toString();
+                gImage.add(path);
+                System.out.println("selected images"+path);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        bottomView.setHasFixedSize(true);
+                        bottomView.setLayoutManager(new LinearLayoutManager(getApplicationContext()
+                                ,LinearLayoutManager.HORIZONTAL,false));
+                        ImageLoaderAdapter adapter =
+                                new ImageLoaderAdapter(getApplicationContext(),gImage);
+                        bottomView.addItemDecoration
+                                (new DividerItemDecoration(bottomView.getContext()
+                                        , DividerItemDecoration.HORIZONTAL));
+                        bottomView.setAdapter(adapter);
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
